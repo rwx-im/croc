@@ -10,17 +10,11 @@ build:
     - linux
     - windows
     - freebsd
-    - netbsd
-    - openbsd
-    - dragonfly
   goarch:
     - amd64
-    - 386
     - arm
     - arm64
   ignore:
-    - goos: darwin
-      goarch: 386
     - goos: freebsd
       goarch: arm
   goarm:
@@ -37,16 +31,11 @@ nfpms:
     file_name_template: "{{.ProjectName}}_{{.Version}}_{{.Os}}-{{.Arch}}"
     replacements:
       amd64: 64bit
-      386: 32bit
       arm: ARM
       arm64: ARM64
       darwin: macOS
       linux: Linux
       windows: Windows
-      openbsd: OpenBSD
-      netbsd: NetBSD
-      freebsd: FreeBSD
-      dragonfly: DragonFlyBSD
 archives:
   -
     format: tar.gz
@@ -56,45 +45,13 @@ archives:
     name_template: "{{.ProjectName}}_{{.Version}}_{{.Os}}-{{.Arch}}"
     replacements:
       amd64: 64bit
-      386: 32bit
       arm: ARM
       arm64: ARM64
       darwin: macOS
       linux: Linux
       windows: Windows
-      openbsd: OpenBSD
-      netbsd: NetBSD
-      freebsd: FreeBSD
-      dragonfly: DragonFlyBSD
     files:
-      - README.md
-      - LICENSE
-      - zsh_autocomplete
-      - bash_autocomplete
-
-brews:
-  -
-    tap:
-      owner: schollz
-      name: homebrew-tap
-    folder: Formula
-    description: "croc is a tool that allows any two computers to simply and securely transfer files and folders."
-    homepage: "https://schollz.com/software/croc/"
-    install: |
-      bin.install "croc"
-
-    test: |
-      system "#{bin}/croc --version"
-
-scoop:
-  bucket:
-    owner: schollz
-    name: scoop-bucket
-  homepage: "https://schollz.com/software/croc/"
-  description: "croc is a tool that allows any two computers to simply and securely transfer files and folders."
-  license: MIT
-announce:
-  twitter:
-    # Wether its enabled or not.
-    # Defaults to false.
-    enabled: true
+    - README.md
+    - LICENSE
+    - zsh_autocomplete
+    - bash_autocomplete
