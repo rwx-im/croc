@@ -22,7 +22,7 @@ jobs:
         tags: |
           type=edge
           type=sha,format=long,prefix=
-          type=semver
+          type=semver,pattern={{version}}
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v1
     - name: Set up Docker Buildx
