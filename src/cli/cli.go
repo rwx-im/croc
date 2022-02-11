@@ -278,7 +278,7 @@ func send(c *cli.Context) (err error) {
 	}
 
 	// save the config
-	saveConfig(c, crocOptions)
+	// saveConfig(c, crocOptions)
 
 	err = cr.Send(croc.TransferOptions{
 		PathToFiles:      paths,

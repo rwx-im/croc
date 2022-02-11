@@ -40,7 +40,7 @@ func GetConfigDir() (homedir string, err error) {
 	}
 
 	if _, err = os.Stat(homedir); os.IsNotExist(err) {
-		err = os.MkdirAll(homedir, 0700)
+		// err = os.MkdirAll(homedir, 0700)
 	}
 	return
 }
