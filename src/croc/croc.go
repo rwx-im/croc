@@ -16,6 +16,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+
 	"golang.org/x/time/rate"
 
 	"github.com/denisbrodbeck/machineid"
@@ -85,7 +86,7 @@ type Client struct {
 
 	// steps involved in forming relationship
 	Step1ChannelSecured       bool
-	Step2FileInfoTransferred   bool
+	Step2FileInfoTransferred  bool
 	Step3RecipientRequestFile bool
 	Step4FileTransfer         bool
 	Step5CloseChannels        bool
@@ -103,10 +104,10 @@ type Client struct {
 	CurrentFileIsClosed    bool
 	LastFolder             string
 
-	TotalSent             int64
+	TotalSent              int64
 	TotalChunksTransferred int
-	chunkMap              map[uint64]struct{}
-	limiter               *rate.Limiter
+	chunkMap               map[uint64]struct{}
+	limiter                *rate.Limiter
 
 	// tcp connections
 	conn []*comm.Comm
@@ -115,11 +116,11 @@ type Client struct {
 	longestFilename int
 	firstSend       bool
 
-	mutex                   *sync.Mutex
-	fread                   *os.File
-	numfinished             int
-	quit                    chan bool
-	finishedNum             int
+	mutex                    *sync.Mutex
+	fread                    *os.File
+	numfinished              int
+	quit                     chan bool
+	finishedNum              int
 	numberOfTransferredFiles int
 }
 
@@ -188,11 +189,11 @@ func New(ops Options) (c *Client, err error) {
 		var rt rate.Limit
 		switch unit := string(c.Options.ThrottleUpload[len(c.Options.ThrottleUpload)-1:]); unit {
 		case "g", "G":
-			uploadLimit = uploadLimit*1024*1024*1024
+			uploadLimit = uploadLimit * 1024 * 1024 * 1024
 		case "m", "M":
-			uploadLimit = uploadLimit*1024*1024
+			uploadLimit = uploadLimit * 1024 * 1024
 		case "k", "K":
-			uploadLimit = uploadLimit*1024
+			uploadLimit = uploadLimit * 1024
 		default:
 			uploadLimit, err = strconv.ParseInt(c.Options.ThrottleUpload, 10, 64)
 			if err != nil {
@@ -200,8 +201,8 @@ func New(ops Options) (c *Client, err error) {
 			}
 		}
 		// Somehow 4* is neccessary
-		rt = rate.Every(time.Second / (4*time.Duration(uploadLimit)))
-		if (int(uploadLimit) > minBurstSize) {
+		rt = rate.Every(time.Second / (4 * time.Duration(uploadLimit)))
+		if int(uploadLimit) > minBurstSize {
 			minBurstSize = int(uploadLimit)
 		}
 		c.limiter = rate.NewLimiter(rt, minBurstSize)
@@ -834,6 +835,15 @@ func (c *Client) processMessageFileInfo(m message.Message) (done bool, err error
 	fname := fmt.Sprintf("%d files", len(c.FilesToTransfer))
 	if len(c.FilesToTransfer) == 1 {
 		fname = fmt.Sprintf("'%s'", c.FilesToTransfer[0].Name)
+	} else {
+		err = message.Send(c.conn[0], c.Key, message.Message{
+			Type:    message.TypeError,
+			Message: "recipient only accepts single files",
+		})
+		if err != nil {
+			return false, err
+		}
+		return true, fmt.Errorf("refused files")
 	}
 	totalSize := int64(0)
 	for i, fi := range c.FilesToTransfer {
@@ -1552,7 +1562,7 @@ func (c *Client) sendData(i int) {
 		n, errRead := c.fread.ReadAt(data, readingPos)
 		// log.Debugf("%d read %d bytes", i, n)
 		readingPos += int64(n)
-		if (c.limiter != nil) {
+		if c.limiter != nil {
 			r := c.limiter.ReserveN(time.Now(), n)
 			log.Debugf("Limiting Upload for %d", r.Delay())
 			time.Sleep(r.Delay())
